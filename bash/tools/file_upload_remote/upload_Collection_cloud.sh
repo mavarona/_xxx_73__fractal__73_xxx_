@@ -10,6 +10,8 @@ purpleColour="\e[0;35m\033[1m"
 turquoiseColour="\e[0;36m\033[1m"
 grayColour="\e[0;37m\033[1m"
 
+data=()
+
 trap ctrl_c INT
 
 function ctrl_c(){
@@ -25,8 +27,15 @@ function help()
    echo -e "\n${greenColour}options: ${endColour}"
    echo -e "\n${greenColour}-h     Print this Help. ${endColour}"
    echo -e "\n${greenColour}-f     Folder to upload. ${endColour}"
-   echo
    exit
+}
+
+# Build curl upload file
+function build_upload_file() {
+    path_upload_str="curl -F 'file=@$1' https://temp.sh/upload"
+    path_upload=$(eval "$path_upload_str")
+    data+=( "$1@@$path_upload" )
+    echo "Todos los elementos: ${data[@]}"
 }
 
 # Read all files in a directory
@@ -35,12 +44,14 @@ function read_dir_content_recursive() {
 
     for elem in "$current_dir"/*; do
         # If is a file
-        echo $elem
-        if [ -f "$elem" ]; then
-            # echo -e "\n${purpleColour}File: $elem${endColour}"
-            echo "..."
+        if [[ "$elem" == *"."* ]]; then
+            #echo -e "\n${blueColour}$elem${endColour}"
+            #echo -e "\n$elem"
+            build_upload_file $elem
+        fi
+
         # If is a directory
-        elif [ -d "$elem" ]; then
+        if [ -d "$elem" ]; then
             read_dir_content_recursive "$elem"
         fi
     done
