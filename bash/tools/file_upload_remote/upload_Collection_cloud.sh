@@ -19,7 +19,7 @@ function ctrl_c(){
 	exit 0
 }
 
-# Sho menu help
+# Show menu help
 function help()
 {
    # Display Help
@@ -38,7 +38,7 @@ function build_upload_file() {
     if [[ $1 =~ $init_dir(.*) ]]; then
         path_build="${BASH_REMATCH[1]}"
     fi
-    data+=( "$path_build@@$path_upload" )
+    data+=( "$path_build@$path_upload" )
 }
 
 # Read all files in a directory
@@ -62,7 +62,7 @@ function read_dir_content_recursive() {
 }
 
 # Main function
-while getopts ":hf:" option; do
+while getopts ":hfo:" option; do
    case $option in
       h) help;;
       f) init_dir=$2; 
