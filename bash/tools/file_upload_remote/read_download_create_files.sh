@@ -42,19 +42,36 @@ function create_folder_file() {
     read -ra allPath <<<"${items[0]}"
     lengthArr=${#allPath[@]}
     if [ $lengthArr -eq 2 ]; then
-        echo "Is file"
+        cd dist
+        item=${items[0]}
+        filename="${item:1}"
+        path_download_str="curl -X POST ${items[1]} > $filename"
+        $(eval "$path_download_str")
+        cd ..
     else
+        cd dist 
         for ((i = 1; i < $lengthArr; i++)); do
-            echo "Element at index $i: ${lengthArr[i]}"
+            if [ $i -eq $((lengthArr - 1)) ]; then
+                path_download_str="curl -X POST ${items[1]} > ${allPath[$i]}"
+                $(eval "$path_download_str")
+            else
+                if [ ! -d "${allPath[$i]}" ]; then
+                    mkdir -p "${allPath[$i]}"
+                fi
+                cd "${allPath[$i]}"
+            fi;
         done
+        cd dist
+        cd .. 
     fi
-    echo ${items[1]}
 }
 
 function read_file(){
     # Check if the file exists
+    echo $file
     if [ -f "$file" ]; then
         # Open the file and read it line by line
+        mkdir -p dist
         while IFS= read -r line; do
             # Process each line as needed
             echo "Processing line: $line"
@@ -72,7 +89,6 @@ while getopts ":hfo:" option; do
             echo "The file '$file' not exists."
             exit 1
         fi;
-        echo "The file $file";
         read_file;;
      \?) help;;
    esac
