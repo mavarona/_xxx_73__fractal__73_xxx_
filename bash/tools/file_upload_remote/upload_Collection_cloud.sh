@@ -34,8 +34,11 @@ function help()
 function build_upload_file() {
     path_upload_str="curl -F 'file=@$1' https://temp.sh/upload"
     path_upload=$(eval "$path_upload_str")
-    data+=( "$1@@$path_upload" )
-    echo "Todos los elementos: ${data[@]}"
+    #data+=( "$1@@$path_upload" )
+    if [[ $1 =~ $init_dir(.*) ]]; then
+        path_build="${BASH_REMATCH[1]}"
+    fi
+    data+=( "$path_build@@$path_upload" )
 }
 
 # Read all files in a directory
@@ -48,6 +51,7 @@ function read_dir_content_recursive() {
             #echo -e "\n${blueColour}$elem${endColour}"
             #echo -e "\n$elem"
             build_upload_file $elem
+            test=$(basename $init_dir)
         fi
 
         # If is a directory
@@ -65,7 +69,11 @@ while getopts ":hf:" option; do
         if [ ! -d "$init_dir" ]; then
             echo "The directory '$init_dir' not exists."
             exit 1
-        fi;read_dir_content_recursive "$init_dir";;
+        fi;
+        read_dir_content_recursive "$init_dir";
+        for str in ${data[@]}; do
+            echo $str
+        done;;
      \?) help;;
    esac
 done
