@@ -32,10 +32,23 @@ function get_path_create_and_link_download() {
 
     IFS='@' #setting space as delimiter  
     read -ra items <<<"$line" #reading str as an array as tokens separated by IFS  
-    for i in "${items[@]}"; do  
-        echo "$i"  
-    done 
+    create_folder_file
 
+}
+
+function create_folder_file() {
+
+    IFS='/' #setting space as delimiter  
+    read -ra allPath <<<"${items[0]}"
+    lengthArr=${#allPath[@]}
+    if [ $lengthArr -eq 2 ]; then
+        echo "Is file"
+    else
+        for ((i = 1; i < $lengthArr; i++)); do
+            echo "Element at index $i: ${lengthArr[i]}"
+        done
+    fi
+    echo ${items[1]}
 }
 
 function read_file(){
